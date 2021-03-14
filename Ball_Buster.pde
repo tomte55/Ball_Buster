@@ -21,7 +21,7 @@ float volume = 0.25;
 float pitch = 0;
 
 void setup() {
-  fullScreen(P2D);
+  fullScreen(FX2D);
 
   minim = new Minim(this);
   hit = minim.loadFile("sounds/hit.wav");

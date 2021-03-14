@@ -32,15 +32,23 @@ class Game extends Scene {
   boolean newHighscore;
   boolean newHighcombo;
 
-  PShader edges = loadShader("edges.glsl");
+  // Grid
+  Grid grid;
+  int cellSize = 500;
+  int gridX = 0;
+  int gridY = 0;
+  int gridRX = 0;
+  int gridRY = 0;
+  int renderDistance = 5;
 
   void setup() {
     particles = new ArrayList<Particles>();
     scoreTexts = new ArrayList<ScoreText>();
     balls = new ArrayList<Ball>();
-    generateBalls();
-    player = new Player(new PVector(width/2, height/2));
+    player = new Player(new PVector(0, -height*3));
     camera = new ExtendedCamera(gm.sketch, player.pos);
+
+    grid = new Grid();
 
     aiming = false;
     score = 0;
@@ -53,7 +61,22 @@ class Game extends Scene {
   }
 
   void draw() {
-    background(50);
+    PVector p = player.pos;
+    gridX = floor(p.x/cellSize)*cellSize;
+    gridY = floor(p.y/cellSize)*cellSize;
+    gridRX = gridX/cellSize;
+    gridRY = gridY/cellSize;
+
+    grid.loadCell(gridRX, gridRY); // Center
+    grid.loadCell(gridRX-1, gridRY); // Left
+    grid.loadCell(gridRX+1, gridRY); // Right
+    grid.loadCell(gridRX, gridRY-1); // Up
+    grid.loadCell(gridRX, gridRY+1); // Down
+    grid.loadCell(gridRX-1, gridRY-1); // Up Left
+    grid.loadCell(gridRX+1, gridRY-1); // Up Right
+    grid.loadCell(gridRX-1, gridRY+1); // Down Left
+    grid.loadCell(gridRX+1, gridRY+1); // Down Right
+
     slowmo = 1;
 
     if (aiming && player.started) {
@@ -66,16 +89,6 @@ class Game extends Scene {
       slowmo = map(fade, 0, 255, 1, 0.1);
     }
 
-    // Slowmotion near killballs
-    Ball killBall = getClosestBall(player.pos, new KillBall().getClass());
-    if (player.started && killBall != null) {
-      float d = PVector.dist(player.pos, killBall.pos);
-      float maxDist = constrain(10*player.vel.mag(), player.size.x/2+killBall.size.x/2+1, 300);
-      if (d < maxDist) {
-        slowmo = constrain(map(d, player.size.x/2+killBall.size.x/2, maxDist, 0.01, 1), 0.01, 1);
-      }
-    }
-
     // Kill player on entering lava
     if (player.pos.y >= height && !player.dead) {
       player.kill("Lava");
@@ -84,8 +97,11 @@ class Game extends Scene {
 
     // Draw
     push();
+    background(50);
     camera.update();
     camera.translateScene();
+
+    grid.update();
 
     for (int i = balls.size()-1; i > -1; i--) {
       Ball b = balls.get(i);
@@ -146,6 +162,13 @@ class Game extends Scene {
     // Health bar
     drawHealthbar();
 
+    push();
+    textAlign(LEFT, TOP);
+    translate(5, 100);
+    text("Chunks: "+grid.cells.size(), 0, 0);
+    text("Loaded: "+grid.loadedCells.size(), 0, 15);
+    pop();
+
     // GameOver
     if (player.dead) {
       fade = constrain(map(frameCount-deathTime, 0, 60, 0, 255), 0, 255);
@@ -182,7 +205,7 @@ class Game extends Scene {
       }
 
       if (player.dead && frameCount-deathTime >= 60) {
-        restartGame();
+        setup();
       }
     }
 
@@ -235,23 +258,5 @@ class Game extends Scene {
     mouse = new PVector(mt.mouseX(), mt.mouseY());
     mt.popMatrix();
     return mouse;
-  }
-
-  void restartGame() {
-    particles = new ArrayList<Particles>();
-    scoreTexts = new ArrayList<ScoreText>();
-    balls = new ArrayList<Ball>();
-    generateBalls();
-    player = new Player(new PVector(width/2, height/2));
-    aiming = false;
-    score = 0;
-    combo = 1;
-    fade = 0;
-    slowmo = 1;
-    aimTime = 0;
-    highRoundCombo = 1;
-    ballsHit = 0;
-    newHighscore = false;
-    newHighcombo = false;
   }
 }

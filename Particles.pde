@@ -56,7 +56,7 @@ class Particle {
     push();
     noStroke();
     fill(clr);
-    translate(pos.x+sin(lt)*50, pos.y);
+    translate(pos.x+sin(lt)*25, pos.y);
     rotate(rotation);
     rectMode(CENTER);
     rect(0, 0, size, size);

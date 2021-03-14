@@ -34,26 +34,24 @@ PVector getAveragePVector(ArrayList<PVector> arr) {
   return total.div(arr.size());
 }
 
-void generateBalls() {
-  for (int i = 0; i < 1000; i++) {
-    PVector p;
-    do {
-      p = getRandomPos();
-    } while (PVector.dist(p, new PVector(width/2, height/2)) < 100);
+ArrayList<Ball> generateBalls(int amount) {
+  ArrayList<Ball> arr = new ArrayList<Ball>();
+  for (int i = 0; i < amount; i++) {
     float rng = random(1);
     if (rng <= 0.01) {
-      game.balls.add(new HealthBall(p));
+      arr.add(new HealthBall());
     } else if (rng <= 0.02) {
-      game.balls.add(new KillBall(p));
-      game.balls.add(new ComboBall(getRandomPos()));
+      arr.add(new KillBall());
+      arr.add(new ComboBall());
     } else if (rng <= 0.05) {
-      game.balls.add(new PointBall(p));
+      arr.add(new PointBall());
     } else if (rng <= 0.1) {
-      game.balls.add(new RandomBall(p));
+      arr.add(new RandomBall());
     } else {
-      game.balls.add(new Ball(p));
+      arr.add(new Ball());
     }
   }
+  return arr;
 }
 
 PVector getRandomPos() {

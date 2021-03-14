@@ -1,15 +1,18 @@
 class Ball extends GameObject {
+  Cell cell = null;
+
   color clr = color(255, 0, 0);
   int score = 100;
 
   AudioPlayer sound;
 
   Ball () {
+    size.set(35, 35);
+    sound = hit;
   }
   Ball (PVector p) {
     pos.set(p);
     size.set(35, 35);
-
     sound = hit;
   }
 
@@ -26,16 +29,18 @@ class Ball extends GameObject {
   }
 
   void blowUp() {
-    game.particles.add(new Particles(pos, 50, clr, 2, game.player.vel));
+    game.particles.add(new Particles(pos, 50, clr, 1, game.player.vel));
     game.scoreTexts.add(new ScoreText(pos, getScore()));
     playSound(sound, -5);
     game.balls.remove(this);
+    cell.balls.remove(this);
   }
 
   void bounce() {
     Player player = game.player;
     player.pos.sub(player.vel);
     PVector v = new PVector(player.pos.x-pos.x, player.pos.y-pos.y).normalize();
+    player.pos.add(player.vel);
     player.vel.set(v.mult(player.vel.mag()));
   }
 
@@ -46,6 +51,9 @@ class Ball extends GameObject {
 
 class RandomBall extends Ball {
   RandomBall () {
+    super();
+    clr = color(255, 0, 255);
+    score = 200;
   }
   RandomBall (PVector p) {
     super(p);
@@ -65,9 +73,13 @@ class RandomBall extends Ball {
 
 class PointBall extends Ball {
   PointBall () {
+    super();
+    size.set(15, 0);
+    clr = color(255, 255, 0);
+    score = 5000;
   }
   PointBall (PVector p) {
-    super(p);
+    super();
     size.set(15, 0);
     clr = color(255, 255, 0);
     score = 5000;
@@ -87,6 +99,9 @@ class KillBall extends Ball {
   float rotation = radians(random(360));
 
   KillBall () {
+    super();
+    clr = color(0, 255, 0);
+    score = -100;
   }
   KillBall (PVector p) {
     super(p);
@@ -115,6 +130,8 @@ class KillBall extends Ball {
 
 class HealthBall extends Ball {
   HealthBall () {
+    super();
+    clr = color(255, 255, 255);
   }
   HealthBall (PVector p) {
     super(p);
@@ -149,6 +166,9 @@ class HealthBall extends Ball {
 
 class ComboBall extends Ball {
   ComboBall () {
+    super();
+    clr = color(0, 0, 0);
+    score = 0;
   }
   ComboBall (PVector p) {
     super(p);
