@@ -2,8 +2,6 @@ class Game extends Scene {
   MouseTransformed mt = new MouseTransformed(gm.sketch);
   Player player;
 
-  CodeWindow codeWindow;
-
   ArrayList<Ball> balls;
 
   ArrayList<Particles> particles;
@@ -52,26 +50,14 @@ class Game extends Scene {
     aimTime = 0;
     highRoundCombo = 1;
     ballsHit = 0;
-
-    codeWindow = new CodeWindow(0, height-300, 400, 300);
   }
 
   void draw() {
     background(50);
-
-    // Update
-    for (int i = particles.size()-1; i > -1; i--) {
-      particles.get(i).update();
-      if (particles.get(i).particles.size() == 0) {
-        particles.remove(i);
-      }
-    }
-
-    player.update();
-
     slowmo = 1;
 
     if (aiming && player.started) {
+      // Aiming slowmo && screen shake
       slowmo = constrain(map(frameCount-aimTime, 0, 30, 0.5, 0.05), 0.05, 0.5);
       camera.shake(1, map(slowmo, 0.5, 0.05, 0, 2));
     }
@@ -80,6 +66,7 @@ class Game extends Scene {
       slowmo = map(fade, 0, 255, 1, 0.1);
     }
 
+    // Slowmotion near killballs
     Ball killBall = getClosestBall(player.pos, new KillBall().getClass());
     if (player.started && killBall != null) {
       float d = PVector.dist(player.pos, killBall.pos);
@@ -89,6 +76,7 @@ class Game extends Scene {
       }
     }
 
+    // Kill player on entering lava
     if (player.pos.y >= height && !player.dead) {
       player.kill("Lava");
       particles.add(new Particles(player.pos, round(10*player.vel.mag()), color(255, 100, 0), player.vel.mag()/3, player.vel.copy().mult(-1)));
@@ -107,16 +95,21 @@ class Game extends Scene {
     }
 
     for (int i = particles.size()-1; i > -1; i--) {
+      particles.get(i).update();
       particles.get(i).show();
+      if (particles.get(i).particles.size() == 0) {
+        particles.remove(i);
+      }
     }
 
     if (aiming) {
       push();
       stroke(255);
-      line(player.pos.x, player.pos.y, getMouse().x, getMouse().y);
+      line(player.pos.x, player.pos.y, getMouse().x, getMouse().y); // Aim line
       pop();
     }
 
+    player.update();
     player.show();
 
     push();
@@ -124,10 +117,6 @@ class Game extends Scene {
     fill(225, 100, 0);
     rect(camera.pos.x-(width/2)/camera.zoom, height, width/camera.zoom, height); // Lava
     pop();
-
-    //filter(edges);
-
-    //drawLava();
 
     for (int i = scoreTexts.size()-1; i > -1; i--) {
       scoreTexts.get(i).show();
@@ -138,9 +127,6 @@ class Game extends Scene {
     pop();
 
     // HUD
-    //codeWindow.show();
-    //codeWindow.runLine();
-
     push();
     fill(255, 255-fade);
     textAlign(CENTER, TOP);

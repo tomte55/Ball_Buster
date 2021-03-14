@@ -1,5 +1,4 @@
 class ExtendedCamera extends Camera {
-
   ArrayList<Float> speeds = new ArrayList<Float>(); // Average speed used for smooth zooming
 
   boolean screenShake = true;
@@ -32,7 +31,6 @@ class ExtendedCamera extends Camera {
       float speed = map(sum/speeds.size(), 0, 10, 1.5, 1);
       zoom = speed;
     }
-
 
     if (screenShake) {
       if (shakeFrames > 0) {

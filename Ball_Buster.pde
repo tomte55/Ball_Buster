@@ -11,13 +11,6 @@ JSONObject configJSON;
 
 int timePlayed;
 int lastTime = 0;
-// Add statistics
-//   -Total balls destroyed
-//   -Highest score from one shot
-//   -Time played
-//   -Highest combo
-
-// Remake screenshake too make it smooth
 
 Minim minim;
 AudioPlayer hit;
@@ -43,7 +36,7 @@ void setup() {
 
   try {
     loadConfig();
-  } 
+  }
   catch(Exception e) {
     saveConfig();
   }
