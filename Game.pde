@@ -16,14 +16,7 @@ class Game extends Scene {
   float slowmo;
 
   // Camera
-  Camera camera;
-  int shakeFrames = 0;
-  float shakeIntensity = 1;
-  ArrayList<Float> speeds;
-  ArrayList<PVector> positions;
-  boolean screenShake = true;
-  boolean freeCam = false;
-  PVector freeCamPos = new PVector();
+  ExtendedCamera camera;
 
   // Gameover screen
   int deathTime = 0;
@@ -41,9 +34,6 @@ class Game extends Scene {
   boolean newHighscore;
   boolean newHighcombo;
 
-
-  Graph fpsGraph;
-
   PShader edges = loadShader("edges.glsl");
 
   void setup() {
@@ -52,7 +42,7 @@ class Game extends Scene {
     balls = new ArrayList<Ball>();
     generateBalls();
     player = new Player(new PVector(width/2, height/2));
-    camera = new Camera(gm.sketch, player.pos, 0, 0);
+    camera = new ExtendedCamera(gm.sketch, player.pos);
 
     aiming = false;
     score = 0;
@@ -63,18 +53,11 @@ class Game extends Scene {
     highRoundCombo = 1;
     ballsHit = 0;
 
-    speeds = new ArrayList<Float>();
-    positions = new ArrayList<PVector>();
-
-    fpsGraph = new Graph(gm.sketch, width-100, 25, "FPS");
-    fpsGraph.toggleMinimal();
-
     codeWindow = new CodeWindow(0, height-300, 400, 300);
   }
 
   void draw() {
     background(50);
-    fpsGraph.addSample(frameRate);
 
     // Update
     for (int i = particles.size()-1; i > -1; i--) {
@@ -90,7 +73,7 @@ class Game extends Scene {
 
     if (aiming && player.started) {
       slowmo = constrain(map(frameCount-aimTime, 0, 30, 0.5, 0.05), 0.05, 0.5);
-      shakeScreen(1, map(slowmo, 0.5, 0.05, 0, 2));
+      camera.shake(1, map(slowmo, 0.5, 0.05, 0, 2));
     }
 
     if (player.dead) {
@@ -111,40 +94,9 @@ class Game extends Scene {
       particles.add(new Particles(player.pos, round(10*player.vel.mag()), color(255, 100, 0), player.vel.mag()/3, player.vel.copy().mult(-1)));
     }
 
-    positions.add(player.pos.copy());
-    if (positions.size() > 15) {
-      positions.remove(0);
-    }
-
-    if (freeCam) {
-      camera.target = freeCamPos;
-    } else {
-      camera.target = getAveragePVector(positions); // Camera target
-      speeds.add(player.vel.mag());
-      if (speeds.size() > 120) {
-        speeds.remove(0);
-      }
-      float sum = 0;
-      for (int i = 0; i < speeds.size(); i++) {
-        sum += speeds.get(i);
-      }
-
-      float slow = map(slowmo, 0.01, 1, 0.5, 0)/camera.zoom; // Camera zooming
-      float speed = map(sum/speeds.size(), 0, 10, 1.5, 1); // Camera zooming
-      camera.zoom = speed;
-
-      if (shakeFrames > 0) {
-        if (screenShake) {
-          camera.offset = PVector.random2D().mult(shakeIntensity); // Camera shake
-        }
-        shakeFrames--;
-      } else {
-        camera.offset.set(0, 0);
-      }
-    }
-
     // Draw
     push();
+    camera.update();
     camera.translateScene();
 
     for (int i = balls.size()-1; i > -1; i--) {
@@ -205,8 +157,6 @@ class Game extends Scene {
     text("x"+combo, 0, 0);
     pop();
 
-    fpsGraph.show();
-
     // Health bar
     drawHealthbar();
 
@@ -258,8 +208,8 @@ class Game extends Scene {
   }
 
   void mouseDragged() {
-    if (mouseButton == RIGHT && freeCam) {
-      freeCamPos.add((pmouseX-mouseX)/camera.zoom, (pmouseY-mouseY)/camera.zoom);
+    if (mouseButton == RIGHT && camera.freeMode) {
+      camera.freeModePos.add((pmouseX-mouseX)/camera.zoom, (pmouseY-mouseY)/camera.zoom);
     }
   }
 
@@ -273,8 +223,7 @@ class Game extends Scene {
 
   void keyPressed() {
     if (gm.input.getKey('f')) {
-      freeCam = !freeCam;
-      freeCamPos = player.pos.copy();
+      camera.toggleFreeCam();
     }
 
     if (gm.input.getKey(27)) {
@@ -318,7 +267,5 @@ class Game extends Scene {
     ballsHit = 0;
     newHighscore = false;
     newHighcombo = false;
-    speeds = new ArrayList<Float>();
-    positions = new ArrayList<PVector>();
   }
 }

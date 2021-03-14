@@ -70,7 +70,7 @@ class Player extends GameObject {
         game.ballsHit++;
         b.blowUp();
 
-        shakeScreen(5, round(vel.mag()*0.5));
+        game.camera.shake(5, round(vel.mag()*0.5));
 
         if (comboShots > 0) {
           Ball cb = getClosestBall(pos);

@@ -34,22 +34,6 @@ PVector getAveragePVector(ArrayList<PVector> arr) {
   return total.div(arr.size());
 }
 
-void renderShader() {
-  loadPixels();
-  for (int i = 0; i < pixels.length; i++) {
-    color c = pixels[i];
-    if (red(c) >= 200 && green(c) >= 100) {
-      pixels[i] = color(0);
-    }
-  }
-  updatePixels();
-}
-
-void shakeScreen(int frames, float intensity) {
-  game.shakeFrames = frames;
-  game.shakeIntensity = intensity;
-}
-
 void generateBalls() {
   for (int i = 0; i < 1000; i++) {
     PVector p;
