@@ -69,6 +69,9 @@ Ball getClosestBall(PVector pos) {
       closestBall = b;
     }
   }
+  if (closestBall == null) {
+    return new Ball();
+  }
   return closestBall;
 }
 
