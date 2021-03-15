@@ -71,18 +71,15 @@ Ball getClosestBall(PVector pos) {
   }
   return closestBall;
 }
-Ball getClosestBall(PVector pos, Class c) {
-  float closest = 9999999;
-  Ball closestBall = null;
-  for (int i = 0; i < game.balls.size(); i++) {
-    Ball b = game.balls.get(i);
-    if (b.getClass() == c) {
-      float d = PVector.dist(b.pos, pos);
-      if (d < closest) {
-        closest = d;
-        closestBall = b;
-      }
-    }
-  }
-  return closestBall;
+
+String getGridPos(PVector p) {
+  int x = floor(p.x/game.cellSize);
+  int y = floor(p.y/game.cellSize);
+  return x + ", " + y;
+}
+
+String getGridPos(int _x, int _y) {
+  int x = floor(_x/game.cellSize);
+  int y = floor(_y/game.cellSize);
+  return x + ", " + y;
 }
