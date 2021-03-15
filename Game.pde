@@ -92,7 +92,7 @@ class Game extends Scene {
     // Kill player on entering lava
     if (player.pos.y >= height && !player.dead) {
       player.kill("Lava");
-      particles.add(new Particles(player.pos, round(10*player.vel.mag()), color(255, 100, 0), player.vel.mag()/3, player.vel.copy().mult(-1)));
+      particles.add(new Particles(player.pos, round(10*player.vel.mag()), color(255, 100, 0)));
     }
 
     // Draw
@@ -105,9 +105,7 @@ class Game extends Scene {
 
     for (int i = balls.size()-1; i > -1; i--) {
       Ball b = balls.get(i);
-      if (camera.pointInside(b.pos, g)) {
-        b.show();
-      }
+      b.show();
     }
 
     for (int i = particles.size()-1; i > -1; i--) {
@@ -167,6 +165,8 @@ class Game extends Scene {
     translate(5, 100);
     text("Chunks: "+grid.cells.size(), 0, 0);
     text("Loaded: "+grid.loadedCells.size(), 0, 15);
+    text("Balls: "+balls.size(), 0, 30);
+    text("VelMag: "+player.vel.mag(), 0, 60);
     pop();
 
     // GameOver

@@ -29,7 +29,7 @@ class Ball extends GameObject {
   }
 
   void blowUp() {
-    game.particles.add(new Particles(pos, 50, clr, 1, game.player.vel));
+    game.particles.add(new Particles(pos, 100, clr));
     game.scoreTexts.add(new ScoreText(pos, getScore()));
     playSound(sound, -5);
     game.balls.remove(this);
@@ -66,7 +66,6 @@ class RandomBall extends Ball {
     player.pos.sub(player.vel);
     PVector v = PVector.random2D();
     player.vel.set(v.mult(15));
-    game.balls.remove(this);
     playSound(boost, -5);
   }
 }
@@ -160,7 +159,6 @@ class HealthBall extends Ball {
     PVector v = new PVector(player.pos.x-pos.x, player.pos.y-pos.y).normalize();
     player.vel.set(v.mult(player.vel.mag()-0.5));
     player.health = 100;
-    game.balls.remove(this);
   }
 }
 
@@ -179,6 +177,5 @@ class ComboBall extends Ball {
   void action() {
     Player player = game.player;
     player.comboShots += 10;
-    game.balls.remove(this);
   }
 }
