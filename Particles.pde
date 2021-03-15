@@ -1,9 +1,10 @@
 class Particles {
   ArrayList<Particle> particles = new ArrayList<Particle>();
 
-  Particles (PVector p, int amount, color clr, float force, PVector dir) {
+  Particles (PVector pos, int amount, color clr) {
     for (int i = 0; i < amount; i++) {
-      particles.add(new Particle(p.copy(), clr, force, dir));
+      PVector p = pos.copy().add(PVector.random2D().mult(35/2));
+      particles.add(new Particle(p, clr));
     }
   }
 
@@ -32,10 +33,11 @@ class Particle {
   float size = random(5, 10);
 
   float lt = random(10);
+  float ltC = random(0.01, 0.07);
 
-  Particle (PVector p, color c, float force, PVector dir) {
+  Particle (PVector p, color c) {
     pos.set(p.copy().add(PVector.random2D().mult(random(5))));
-    vel = PVector.random2D().add(dir.copy().normalize()).mult(random(force));
+    vel = PVector.random2D();
     push();
     colorMode(HSB, 360, 100, 100);
     clr = color(hue(c)+random(-25, 25), saturation(c)+random(-25, 25), brightness(c)+random(-25, 25));
@@ -43,20 +45,36 @@ class Particle {
   }
 
   void update() {
-    vel.y += (0.05*size/5)*game.slowmo;
-    pos.add(vel.copy().mult(game.slowmo));
     size -= 0.05*game.slowmo;
 
-    lt += 0.05*game.slowmo;
+    lt += ltC*game.slowmo;
 
+    vel.x = sin(lt);
     rotation += sin(lt)/15;
+
+    Ball b = getClosestBall(pos);
+    if (PVector.dist(b.pos, pos) < b.size.x/2 && pos.y < b.pos.y) {
+      vel.set(0, 0);
+      rotation = 0;
+    } else {
+      vel.y += (0.03*size/5)*game.slowmo;
+      pos.add(vel.copy().mult(game.slowmo));
+      pos.x += sin(lt)*game.slowmo;
+      pos.y += cos(lt)*game.slowmo;
+
+      Player player = game.player;
+      float d = PVector.dist(player.pos, pos);
+      if (d < 100) {
+        pos.add(player.vel.copy().mult(map(d, 0, 100, 0.6, 0.1)).mult(game.slowmo));
+      }
+    }
   }
 
   void show() {
     push();
     noStroke();
     fill(clr);
-    translate(pos.x+sin(lt)*25, pos.y);
+    translate(pos.x, pos.y);
     rotate(rotation);
     rectMode(CENTER);
     rect(0, 0, size, size);
