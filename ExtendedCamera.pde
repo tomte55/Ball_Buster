@@ -28,8 +28,8 @@ class ExtendedCamera extends Camera {
       for (int i = 0; i < speeds.size(); i++) {
         sum += speeds.get(i);
       }
-      float speed = map(sum/speeds.size(), 0, 10, 1.5, 1);
-      zoom = speed;
+      float speed = map(sum/speeds.size(), 0, 20, 1.5, 0.8);
+      zoom = constrain(speed, 0.8, 1.5);
     }
 
     if (screenShake) {
