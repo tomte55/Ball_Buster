@@ -17,6 +17,7 @@ AudioPlayer hit;
 AudioPlayer death;
 AudioPlayer boost;
 AudioPlayer coin;
+AudioPlayer shoot;
 float volume = 0.25;
 float pitch = 0;
 
@@ -28,6 +29,7 @@ void setup() {
   death = minim.loadFile("sounds/death.wav");
   boost = minim.loadFile("sounds/boost.wav");
   coin = minim.loadFile("sounds/coin.wav");
+  shoot = minim.loadFile("sounds/shoot.wav");
 
   gm = new GameManager(this);
   gm.enableDebug();
@@ -58,7 +60,7 @@ void exit() {
   super.exit();
 }
 
-void playSound(AudioPlayer sound, int dB) {
+void playSound(AudioPlayer sound, float dB) {
   sound.setGain(dB/volume);
   sound.play(0);
 }

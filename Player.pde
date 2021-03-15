@@ -24,9 +24,7 @@ class Player extends GameObject {
       push();
       fill(clr);
       noStroke();
-      translate(pos.x, pos.y);
-      rotate(vel.heading());
-      ellipse(0, 0, size.x, size.x);
+      ellipse(pos.x, pos.y, size.x, size.x);
       pop();
     }
   }
@@ -54,32 +52,31 @@ class Player extends GameObject {
 
     Ball b = getClosestBall(pos);
     PVector p = b.pos;
-    if (game.camera.pointInside(p, g)) {
-      if (PVector.dist(p, pos) < size.x/2+b.size.x/2) {
-        game.textBounce += 15;
-        health += 10;
-        health = constrain(health, 0, 100);
-        b.action();
-        if (canShoot) {
-          game.combo++;
-          if (game.combo >= game.highRoundCombo) {
-            game.highRoundCombo = game.combo;
-          }
+    if (PVector.dist(p, pos) < size.x/2+b.size.x/2) { // Detect collision with ball
+      game.textBounce += 15; // Bounce score text
+      health += 10;
+      health = constrain(health, 0, 100);
+      b.action(); // Perform ball action
+      if (canShoot) {
+        game.combo++;
+        if (game.combo >= game.highRoundCombo) {
+          game.highRoundCombo = game.combo;
         }
-        canShoot = true;
-        game.ballsHit++;
-        b.blowUp();
+      }
+      canShoot = true;
+      game.ballsHit++;
 
-        game.camera.shake(5, round(vel.mag()*0.5));
+      b.blowUp();
 
-        if (comboShots > 0) {
-          Ball cb = getClosestBall(pos);
-          if (!(cb instanceof KillBall)) {
-            PVector target = cb.pos;
-            PVector v = new PVector(target.x-pos.x, target.y-pos.y).setMag(vel.mag());
-            vel.set(v);
-            comboShots--;
-          }
+      game.camera.shake(5, round(vel.mag()*0.5));
+
+      if (comboShots > 0) { // Auto shoot at closest ball
+        Ball cb = getClosestBall(pos);
+        if (!(cb instanceof KillBall)) {
+          PVector target = cb.pos;
+          PVector v = new PVector(target.x-pos.x, target.y-pos.y).setMag(15);
+          vel.set(v);
+          comboShots--;
         }
       }
     }
@@ -93,6 +90,8 @@ class Player extends GameObject {
       PVector v = new PVector(target.x-pos.x, target.y-pos.y).normalize();
       vel.set(v.mult(10));
       game.combo = 1;
+      game.particles.add(new Particles(pos, 25, color(255)));
+      playSound(shoot, -1.5);
     }
   }
 
@@ -104,7 +103,7 @@ class Player extends GameObject {
     game.aiming = false;
     game.deathTime = frameCount;
     playSound(death, -5);
-    game.particles.add(new Particles(pos, 25, clr, 2, new PVector(0, 0)));
+    game.particles.add(new Particles(pos, 75, clr));
     saveConfig();
   }
 }
