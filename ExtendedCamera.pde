@@ -32,7 +32,7 @@ class ExtendedCamera extends Camera {
       zoom = constrain(speed, 0.8, 1.5);
     }
 
-    if (screenShake) {
+    if (screenShake && !freeMode) {
       if (shakeFrames > 0) {
         offset = PVector.random2D().mult(shakeIntensity);
         shakeFrames--;
