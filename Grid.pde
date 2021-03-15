@@ -81,7 +81,6 @@ class Cell {
       loaded = true;
       loadedTime = 0;
       game.grid.loadedCells.add(this);
-      println("loaded "+pos.x/size+", "+pos.y/size);
     }
   }
 
@@ -92,7 +91,6 @@ class Cell {
       }
       loaded = false;
       game.grid.loadedCells.remove(this);
-      println("unloaded "+pos.x/size+", "+pos.y/size);
     }
   }
 }
