@@ -63,6 +63,9 @@ class Cell {
   Cell (float x, float y) {
     pos.set(x, y);
     int amount = round(map(y, 0, -5000, 25, 1));
+    if (y >= height-500) {
+      amount = 0;
+    }
     ArrayList<Ball> types = generateBalls(amount);
     for (int i = 0; i < types.size(); i++) {
       PVector p = new PVector(x+random(size), y+random(size));
